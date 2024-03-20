@@ -50,7 +50,7 @@ async function run() {
     await client.connect();
     console.log("Connected to MongoDB");
 
-    const db = client.db("assignment");
+    const db = client.db("foodManagement");
     const userCollection = db.collection("users");
     const suppliesCollection = db.collection("supplies");
     const volunteerCollection = db.collection("volunteers");
