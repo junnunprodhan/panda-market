@@ -55,7 +55,7 @@ async function run() {
     const drinkCollection = db.collection("drink");
     const volunteerCollection = db.collection("volunteers");
     const donationCollection = db.collection("donation");
-    const categoryCollection = db.collection("category");
+    const brandsCollection = db.collection("brands");
 
     // User Registration
     app.post("/api/v1/register", async (req, res) => {
@@ -167,7 +167,7 @@ async function run() {
     //* update supply
     app.patch("/api/v1/supply/update/:id", verifyJwt, async (req, res) => {
       const id = req.params.id;
-      const { title, quantity, category, description, image } = req.body;
+      const { title, quantity, brands, description, image } = req.body;
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updatedDoc = {
@@ -175,7 +175,7 @@ async function run() {
           title: title,
           quantity: quantity,
           description: description,
-          category: category,
+          brands: brands,
           image: image,
         },
       };
@@ -190,9 +190,9 @@ async function run() {
       });
     });
 
-    //& get donation category
-    app.get("/api/v1/donation-category", verifyJwt, async (req, res) => {
-      const response = await categoryCollection.find().toArray();
+    //& get donation brands
+    app.get("/api/v1/donation-brands", verifyJwt, async (req, res) => {
+      const response = await brandsCollection.find().toArray();
       res.status(200).json({
         success: true,
         data: response,
@@ -222,21 +222,21 @@ async function run() {
     //? donate supply
     app.post("/api/v1/donation", verifyJwt, async (req, res) => {
       const body = req.body;
-      const category = body.category;
-      //find category
+      const brands = body.brands;
+      //find brands
       const options = { upsert: true };
-      const findCategory = await categoryCollection.findOne({
-        category: category,
+      const findbrands = await brandsCollection.findOne({
+        brands: brands,
       });
-      const filterCategory = { _id: new ObjectId(findCategory?._id) };
-      const updatedCategoryDoc = {
+      const filterbrands = { _id: new ObjectId(findbrands?._id) };
+      const updatedbrandsDoc = {
         $set: {
-          totalDonate: findCategory?.totalDonate + 1,
+          totalDonate: findbrands?.totalDonate + 1,
         },
       };
-      await categoryCollection.updateOne(
-        filterCategory,
-        updatedCategoryDoc,
+      await brandsCollection.updateOne(
+        filterbrands,
+        updatedbrandsDoc,
         options
       );
 
