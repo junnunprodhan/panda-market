@@ -52,12 +52,10 @@ async function run() {
 
     const db = client.db("foodManagement");
     const userCollection = db.collection("users");
-    const suppliesCollection = db.collection("supplies");
+    const drinkCollection = db.collection("drink");
     const volunteerCollection = db.collection("volunteers");
     const donationCollection = db.collection("donation");
     const categoryCollection = db.collection("category");
-    const commentsCollection = db.collection("comments");
-    const testimonialsCollection = db.collection("testimonials");
 
     // User Registration
     app.post("/api/v1/register", async (req, res) => {
@@ -125,19 +123,19 @@ async function run() {
       });
     });
 
-    //? post supplies
-    app.post("/api/v1/supplies", verifyJwt, async (req, res) => {
+    //? post drink
+    app.post("/api/v1/drink", verifyJwt, async (req, res) => {
       const body = req.body;
-      const response = await suppliesCollection.insertOne(body);
+      const response = await drinkCollection.insertOne(body);
       res.status(200).json({
         success: true,
         data: response,
       });
     });
 
-    //* get supplies
-    app.get("/api/v1/supplies", async (req, res) => {
-      const response = await suppliesCollection.find().toArray();
+    //* get drink
+    app.get("/api/v1/drink", async (req, res) => {
+      const response = await drinkCollection.find().toArray();
       res.status(200).json({
         success: true,
         data: response,
@@ -145,10 +143,10 @@ async function run() {
     });
 
     //& get supply by id
-    app.get("/api/v1/supplies/:id", verifyJwt, async (req, res) => {
+    app.get("/api/v1/drink/:id", verifyJwt, async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
-      const response = await suppliesCollection.findOne(query);
+      const response = await drinkCollection.findOne(query);
       res.status(200).json({
         success: true,
         data: response,
@@ -159,7 +157,7 @@ async function run() {
     app.delete("/api/v1/delete-supply/:id", verifyJwt, async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
-      const response = await suppliesCollection.deleteOne(query);
+      const response = await drinkCollection.deleteOne(query);
       res.status(200).json({
         success: true,
         data: response,
@@ -181,7 +179,7 @@ async function run() {
           image: image,
         },
       };
-      const response = await suppliesCollection.updateOne(
+      const response = await drinkCollection.updateOne(
         filter,
         updatedDoc,
         options
@@ -266,55 +264,7 @@ async function run() {
       }
     });
 
-    //! get donner info
 
-    app.get("/api/v1/donner-info", async (req, res) => {
-      const response = await donationCollection.find().toArray();
-      res.status(200).json({
-        success: true,
-        data: response,
-      });
-    });
-
-    //! post users comments
-
-    app.post("/api/v1/comments", verifyJwt, async (req, res) => {
-      const body = req.body;
-      const response = await commentsCollection.insertOne(body);
-      res.status(200).json({
-        success: true,
-        data: response,
-      });
-    });
-
-    //? get comments
-
-    app.get("/api/v1/comments", async (req, res) => {
-      const response = await commentsCollection.find().toArray();
-      res.status(200).json({
-        success: true,
-        data: response,
-      });
-    });
-
-    // ^ post testimonial
-    app.post("/api/v1/testimonial", verifyJwt, async (req, res) => {
-      const body = req.body;
-      const response = await testimonialsCollection.insertOne(body);
-      res.status(200).json({
-        success: true,
-        data: response,
-      });
-    });
-
-    // ~ get testimonials
-    app.get("/api/v1/testimonial", async (req, res) => {
-      const response = await testimonialsCollection.find().toArray();
-      res.status(200).json({
-        success: true,
-        data: response,
-      });
-    });
 
     // ==============================================================
 
