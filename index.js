@@ -50,11 +50,10 @@ async function run() {
     await client.connect();
     console.log("Connected to MongoDB");
 
-    const db = client.db("foodManagement");
+    const db = client.db("panda-market");
     const userCollection = db.collection("users");
     const drinkCollection = db.collection("drink");
-    const volunteerCollection = db.collection("volunteers");
-    const donationCollection = db.collection("donation");
+    const FlashSaleCollection = db.collection("flashSale");
     const brandsCollection = db.collection("brands");
 
     // User Registration
@@ -110,8 +109,6 @@ async function run() {
       });
     });
 
-    // ==============================================================
-    // WRITE YOUR CODE HERE
 
     //! get single user by email
     app.get("/api/v1/user", async (req, res) => {
@@ -154,7 +151,7 @@ async function run() {
     });
 
     //! get supply by id
-    app.delete("/api/v1/delete-supply/:id", verifyJwt, async (req, res) => {
+    app.delete("/api/v1/delete-drink/:id", verifyJwt, async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const response = await drinkCollection.deleteOne(query);
@@ -165,7 +162,7 @@ async function run() {
     });
 
     //* update supply
-    app.patch("/api/v1/supply/update/:id", verifyJwt, async (req, res) => {
+    app.patch("/api/v1/drink/update/:id", verifyJwt, async (req, res) => {
       const id = req.params.id;
       const { title, quantity, brands, description, image } = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -189,81 +186,14 @@ async function run() {
         data: response,
       });
     });
-
-    //& get donation brands
-    app.get("/api/v1/donation-brands", verifyJwt, async (req, res) => {
-      const response = await brandsCollection.find().toArray();
+// get flashSale
+    app.get("/api/v1/flash-sale", async (req, res) => {
+      const response = await FlashSaleCollection.find().toArray();
       res.status(200).json({
         success: true,
         data: response,
       });
     });
-
-    //^ volunter post
-
-    app.post("/api/v1/volunteer-signup", verifyJwt, async (req, res) => {
-      const body = req.body;
-      const response = await volunteerCollection.insertOne(body);
-      res.status(200).json({
-        success: true,
-        data: response,
-      });
-    });
-
-    // get volunteer
-    app.get("/api/v1/get-volunteers", async (req, res) => {
-      const response = await volunteerCollection.find().toArray();
-      res.status(200).json({
-        success: true,
-        data: response,
-      });
-    });
-
-    //? donate supply
-    app.post("/api/v1/donation", verifyJwt, async (req, res) => {
-      const body = req.body;
-      const brands = body.brands;
-      //find brands
-      const options = { upsert: true };
-      const findbrands = await brandsCollection.findOne({
-        brands: brands,
-      });
-      const filterbrands = { _id: new ObjectId(findbrands?._id) };
-      const updatedbrandsDoc = {
-        $set: {
-          totalDonate: findbrands?.totalDonate + 1,
-        },
-      };
-      await brandsCollection.updateOne(
-        filterbrands,
-        updatedbrandsDoc,
-        options
-      );
-
-      //! find exist user
-      const existUser = await donationCollection.findOne({
-        userEmail: body?.userEmail,
-      });
-      if (existUser) {
-        const filterUser = { _id: new ObjectId(existUser?._id) };
-        const updatedUserDoc = {
-          $set: {
-            donateSupply: existUser?.donateSupply + 1,
-          },
-        };
-        await donationCollection.updateOne(filterUser, updatedUserDoc, options);
-        res.status(200).json({
-          success: true,
-        });
-      } else {
-        const response = await donationCollection.insertOne(body);
-        res.status(200).json({
-          success: true,
-          data: response,
-        });
-      }
-    });
-
 
 
     // ==============================================================
