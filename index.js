@@ -194,8 +194,23 @@ async function run() {
         data: response,
       });
     });
-
-
+  //? post flashSale
+  app.post("/api/v1/create-flash-sale", verifyJwt, async (req, res) => {
+    const body = req.body;
+    const response = await FlashSaleCollection.insertOne(body);
+    res.status(200).json({
+      success: true,
+      data: response,
+    });
+  });
+ //& get brands
+ app.get("/api/v1/brands", verifyJwt, async (req, res) => {
+  const response = await brandsCollection.find().toArray();
+  res.status(200).json({
+    success: true,
+    data: response,
+  });
+});
     // ==============================================================
 
     // Start the server
