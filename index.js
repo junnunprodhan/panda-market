@@ -22,27 +22,27 @@ const client = new MongoClient(uri, {
   },
 });
 
-const verifyJwt = (req, res, next) => {
-  const authorization = req.headers?.authorization;
-  if (!authorization) {
-    res.status(401).send({ error: true, message: "Unauthorized access!" });
-  }
-  const token = authorization?.split(" ")[1];
-  if (!token) {
-    return res
-      .status(401)
-      .send({ error: true, message: "Unauthorized access!" });
-  }
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res
-        .status(401)
-        .send({ error: true, message: "Unauthorized access!" });
-    }
-    req.decoded = decoded;
-    next();
-  });
-};
+// const verifyJwt = (req, res, next) => {
+//   const authorization = req.headers?.authorization;
+//   if (!authorization) {
+//     res.status(401).send({ error: true, message: "Unauthorized access!" });
+//   }
+//   const token = authorization?.split(" ")[1];
+//   if (!token) {
+//     return res
+//       .status(401)
+//       .send({ error: true, message: "Unauthorized access!" });
+//   }
+//   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+//     if (err) {
+//       return res
+//         .status(401)
+//         .send({ error: true, message: "Unauthorized access!" });
+//     }
+//     req.decoded = decoded;
+//     next();
+//   });
+// };
 
 async function run() {
   try {
@@ -121,7 +121,7 @@ async function run() {
     });
 
     //? post drink
-    app.post("/api/v1/drink", verifyJwt, async (req, res) => {
+    app.post("/api/v1/drink", async (req, res) => {
       const body = req.body;
       const response = await drinkCollection.insertOne(body);
       res.status(200).json({
@@ -133,14 +133,16 @@ async function run() {
     //* get drink
     app.get("/api/v1/drink", async (req, res) => {
       const response = await drinkCollection.find().toArray();
+      console.log(response)
       res.status(200).json({
         success: true,
         data: response,
+        
       });
     });
 
     //& get supply by id
-    app.get("/api/v1/drink/:id", verifyJwt, async (req, res) => {
+    app.get("/api/v1/drink/:id", async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const response = await drinkCollection.findOne(query);
@@ -151,7 +153,7 @@ async function run() {
     });
 
     //! get supply by id
-    app.delete("/api/v1/delete-drink/:id", verifyJwt, async (req, res) => {
+    app.delete("/api/v1/delete-drink/:id", async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const response = await drinkCollection.deleteOne(query);
@@ -162,7 +164,7 @@ async function run() {
     });
 
     //* update supply
-    app.patch("/api/v1/drink/update/:id", verifyJwt, async (req, res) => {
+    app.patch("/api/v1/drink/update/:id",  async (req, res) => {
       const id = req.params.id;
       const { title, quantity, brands, description, image } = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -195,7 +197,7 @@ async function run() {
       });
     });
     // get single flashSale
-    app.get("/api/v1/flash-sale/:id", verifyJwt, async (req, res) => {
+    app.get("/api/v1/flash-sale/:id",  async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const response = await FlashSaleCollection.findOne(query);
@@ -205,7 +207,7 @@ async function run() {
       });
     });
   //? post flashSale
-  app.post("/api/v1/create-flash-sale", verifyJwt, async (req, res) => {
+  app.post("/api/v1/create-flash-sale",  async (req, res) => {
     const body = req.body;
     const response = await FlashSaleCollection.insertOne(body);
     res.status(200).json({
@@ -214,7 +216,7 @@ async function run() {
     });
   });
  //& get brands
- app.get("/api/v1/brands", verifyJwt, async (req, res) => {
+ app.get("/api/v1/brands",  async (req, res) => {
   const response = await brandsCollection.find().toArray();
   res.status(200).json({
     success: true,
