@@ -194,6 +194,16 @@ async function run() {
         data: response,
       });
     });
+    // get single flashSale
+    app.get("/api/v1/flash-sale/:id", verifyJwt, async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: new ObjectId(id) };
+      const response = await FlashSaleCollection.findOne(query);
+      res.status(200).json({
+        success: true,
+        data: response,
+      });
+    });
   //? post flashSale
   app.post("/api/v1/create-flash-sale", verifyJwt, async (req, res) => {
     const body = req.body;
@@ -211,6 +221,8 @@ async function run() {
     data: response,
   });
 });
+
+
     // ==============================================================
 
     // Start the server
